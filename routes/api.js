@@ -40,6 +40,7 @@ router.post('/my-blog', forbidden, function(req, res, next) {
 
 // Update entity
 router.put('/my-blog', forbidden, function(req, res, next) {
+    console.log(req.user);
     let blogi = req.body;
     Blog.update({_id: blogi._id}, blogi, function(err, blog) {
         if (err) console.log(err);
@@ -74,6 +75,7 @@ router.get('/user', function(req, res, next) {
 
 
 function forbidden(req, res, next) {
+    console.log(req.user);
     if (req.user && req.user.rights === 'mieszko') {
         next();
     } else {

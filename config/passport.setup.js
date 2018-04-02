@@ -28,6 +28,7 @@ passport.use(
         // passport cb f-n
             User.findOne({googleId: profile.id}).then((currentUser) => {
                 if (currentUser) {
+                    console.log(currentUser);
                     done(null, currentUser);
                 } else {
                     // if not create new user in our db
