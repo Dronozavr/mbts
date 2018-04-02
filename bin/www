@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('mbts-be:server');
 var http = require('http');
+var path = require('path');
 
 /**
  * Get port from environment and store in Express.
@@ -96,8 +97,8 @@ var https = require('https');
 var http_port = normalizePort(process.env.PORT || '8080');
 var https_port    =   process.env.PORT_HTTPS || 8000;
 var options = {
-    key: fs.readFileSync('./key.pem', 'utf8'),
-    cert: fs.readFileSync('./server.crt', 'utf8')
+    key: fs.readFileSync(path.resolve(__dirname, '../key.pem'), 'utf8'),
+    cert: fs.readFileSync(path.resolve(__dirname, '../server.crt'), 'utf8')
 };
 
 app.set("port",https_port);
