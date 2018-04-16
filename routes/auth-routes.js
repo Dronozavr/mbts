@@ -15,9 +15,7 @@ router.get('/google/redirect', passport.authenticate('google', {
 }));
 
 // auth logout
-router.get('/facebook', passport.authenticate('facebook', {
-    scope: ['profile']
-}));
+router.get('/facebook', passport.authenticate('facebook'));
 
 
 // callback route for google to redirect to

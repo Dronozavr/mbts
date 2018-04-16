@@ -49,9 +49,10 @@ passport.use(
 passport.use(new FacebookStrategy({
         clientID: keys.facebook.clientID,
         clientSecret: keys.facebook.clientSecret,
-        callbackURL: "/auth/facebook/callback"
+        callbackURL: "/auth/facebook/redirect"
     },
     function(accessToken, refreshToken, profile, done) {
+        console.log(profile);
         User.findOne({facebookId: profile.id}).then((currentUser) => {
             if (currentUser) {
                 done(null, currentUser);

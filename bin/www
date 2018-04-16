@@ -94,7 +94,7 @@ function onListening() {
 // Add HTTPS Section
 var fs = require('fs');
 var https = require('https');
-var http_port = normalizePort(process.env.PORT || '8080');
+var http_port = normalizePort(process.env.PORT || '8088');
 var https_port    =   process.env.PORT_HTTPS || 8000;
 var options = {
     key: fs.readFileSync(path.resolve(__dirname, '../key.pem'), 'utf8'),
