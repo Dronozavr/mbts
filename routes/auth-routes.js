@@ -25,4 +25,10 @@ router.get('/facebook/redirect', passport.authenticate('facebook', {
     failureFlash              : true
 }));
 
+
+router.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
 module.exports = router;
