@@ -49,7 +49,7 @@ passport.use(
 passport.use(new FacebookStrategy({
         clientID: keys.facebook.clientID,
         clientSecret: keys.facebook.clientSecret,
-        callbackURL: "/auth/facebook/redirect"
+        callbackURL: "https://mieszkobuliktrainingsystem.pl/auth/facebook/redirect"
     },
     function(accessToken, refreshToken, profile, done) {
         console.log(profile);
