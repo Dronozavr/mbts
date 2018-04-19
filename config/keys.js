@@ -3,7 +3,8 @@
 module.exports = {
     google: {
         clientID: '195608790129-7t7nl4mn6trl1l8s4n2mhlabdiikthcs.apps.googleusercontent.com',
-        clientSecret: 'slDLGLXf-2y2fsBugcpDzZlr'
+        clientSecret: 'slDLGLXf-2y2fsBugcpDzZlr',
+        refreshToken: '1/kG8j3VcCjVk634h_tFfkTo_jB_0bDG4jD6sN5MjcDIA'
     },
     facebook: {
         clientID: '352869718543955',
@@ -14,5 +15,9 @@ module.exports = {
     },
     session: {
         cookieKey: 'ctrhtn'
+    },
+    mail: {
+        name: 'andriykuf@gmail.com',
+        pass: '01091992Kuf'
     }
 };

@@ -69,7 +69,6 @@ router.delete('/my-blog/:id', forbidden, function(req, res, next) {
 
 // Update entity
 router.get('/user', function(req, res, next) {
-    console.log(req.user);
     res.json(req.user);
 });
 

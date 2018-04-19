@@ -11,6 +11,7 @@ const passport = require('passport');
 const keys = require('./config/keys');
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
+var mailRouter = require('./routes/mail');
 var authRouter = require('./routes/auth-routes');
 const passportSetup = require('./config/passport.setup');
 
@@ -57,6 +58,7 @@ app.use(function(req, res, next) {
 app.use('/ui', indexRouter);
 app.use('/api', apiRouter);
 app.use('/auth', authRouter);
+app.use('/mail', mailRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
