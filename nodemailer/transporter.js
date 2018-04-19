@@ -18,8 +18,6 @@ const keys = require('../config/keys');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    secure: false,
-    port: 465, // true for 465, false for other ports
     auth: {
         user: keys.mail.name,
         pass: keys.mail.pass
