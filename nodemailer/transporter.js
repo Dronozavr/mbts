@@ -18,6 +18,7 @@ const keys = require('../config/keys');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
     auth: {
         user: keys.mail.name,
         pass: keys.mail.pass
