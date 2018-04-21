@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 var Blog = require('../models/blog');
+var Decerta = require('../models/dekerta');
 
 // Get list
-router.get('/list', function(req, res, next) {
+router.get('/my-blog/list', function(req, res, next) {
   Blog.find(function(err, blogs) {
 
       let response = { blogs, rights: req.user && req.user.rights === 'mieszko' || false };
@@ -108,5 +109,70 @@ function forbidden(req, res, next) {
     }
 }
 
+
+// dekerta
+// Get list
+router.get('/dekerta-blog/list', function(req, res, next) {
+    Decerta.find(function(err, blogs) {
+
+        let response = { blogs, rights: req.user && req.user.rights === 'mieszko' || false };
+
+        res.json(response);
+    });
+
+});
+
+// Get entity
+router.get('/dekerta-blog/:id', function(req, res, next) {
+    Decerta.findById(req.params.id, function(err, blog) {
+        if (err) console.log(err);
+
+        let response = { ...blog._doc, rights: req.user && req.user.rights === 'mieszko' || false };
+
+        res.json(response);
+    });
+
+});
+
+
+// Create entity
+router.post('/dekerta-blog', forbidden, function(req, res, next) {
+    let blog = req.body;
+
+    Decerta.create(blog, function(err, blog) {
+        if (err) console.log(err);
+        res.json(blog);
+    });
+});
+
+
+// Update entity
+router.put('/dekerta-blog', forbidden, function(req, res, next) {
+    console.log(req.user);
+    let blogi = req.body;
+    Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
+        if (err) console.log(err);
+
+
+        Decerta.findById(blogi._id, function(err, bloga) {
+            if (err) console.log(err);
+
+            res.json(bloga);
+        });
+
+    });
+
+});
+
+
+// Update entity
+router.delete('/my-blog/:id', forbidden, function(req, res, next) {
+    let blogId = req.params.id;
+    Decerta.remove({_id: blogId}, function(err, blog) {
+        if (err) console.log(err);
+        res.json(blog);
+    });
+
+});
 
 module.exports = router;
