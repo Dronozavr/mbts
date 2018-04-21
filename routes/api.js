@@ -3,6 +3,7 @@ var router = express.Router();
 
 var Blog = require('../models/blog');
 var Decerta = require('../models/dekerta');
+var User = require('../models/user-model');
 
 // Get list
 router.get('/my-blog/list', function(req, res, next) {
@@ -29,7 +30,7 @@ router.get('/my-blog/:id', function(req, res, next) {
 
 
 // Create entity
-router.post('/my-blog', forbidden, function(req, res, next) {
+router.post('/my-blog', forbiddenMieszko, function(req, res, next) {
     let blog = req.body;
 
     Blog.create(blog, function(err, blog) {
@@ -40,7 +41,7 @@ router.post('/my-blog', forbidden, function(req, res, next) {
 
 
 // Update entity
-router.put('/my-blog', forbidden, function(req, res, next) {
+router.put('/my-blog', forbiddenMieszko, function(req, res, next) {
     console.log(req.user);
     let blogi = req.body;
     Blog.update({_id: blogi._id}, blogi, function(err, blog) {
@@ -59,7 +60,7 @@ router.put('/my-blog', forbidden, function(req, res, next) {
 
 
 // Update entity
-router.delete('/my-blog/:id', forbidden, function(req, res, next) {
+router.delete('/my-blog/:id', forbiddenMieszko, function(req, res, next) {
     let blogId = req.params.id;
     Blog.remove({_id: blogId}, function(err, blog) {
         if (err) console.log(err);
@@ -110,9 +111,9 @@ function forbidden(req, res, next) {
 }
 
 
-// dekerta
+// ******************************************* DEKERTA ***************************************** //
 // Get list
-router.get('/dekerta-blog/list', function(req, res, next) {
+router.get('/dekerta-blog/list', forbiddenDecerta, function(req, res, next) {
     Decerta.find(function(err, blogs) {
 
         let response = { blogs, rights: req.user && req.user.rights === 'mieszko' || false };
@@ -123,7 +124,7 @@ router.get('/dekerta-blog/list', function(req, res, next) {
 });
 
 // Get entity
-router.get('/dekerta-blog/:id', function(req, res, next) {
+router.get('/dekerta-blog/:id', forbiddenDecerta, function(req, res, next) {
     Decerta.findById(req.params.id, function(err, blog) {
         if (err) console.log(err);
 
@@ -136,7 +137,7 @@ router.get('/dekerta-blog/:id', function(req, res, next) {
 
 
 // Create entity
-router.post('/dekerta-blog', forbidden, function(req, res, next) {
+router.post('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
     let blog = req.body;
 
     Decerta.create(blog, function(err, blog) {
@@ -147,7 +148,7 @@ router.post('/dekerta-blog', forbidden, function(req, res, next) {
 
 
 // Update entity
-router.put('/dekerta-blog', forbidden, function(req, res, next) {
+router.put('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
     console.log(req.user);
     let blogi = req.body;
     Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
@@ -166,7 +167,7 @@ router.put('/dekerta-blog', forbidden, function(req, res, next) {
 
 
 // Update entity
-router.delete('/my-blog/:id', forbidden, function(req, res, next) {
+router.delete('/dekerta-blog/:id', forbiddenMieszko, function(req, res, next) {
     let blogId = req.params.id;
     Decerta.remove({_id: blogId}, function(err, blog) {
         if (err) console.log(err);
@@ -174,5 +175,66 @@ router.delete('/my-blog/:id', forbidden, function(req, res, next) {
     });
 
 });
+
+function forbiddenDecerta(req, res, next) {
+    console.log(req.user);
+    if (req.user && req.user.rights === 'mieszko' || req.user && req.user.rights === 'vip') {
+        next();
+    } else {
+        res.status(500).send({ error: 'Sorry you have no rights to see this page, please contact administrator or log-in!'});
+    }
+}
+
+
+// ****************************************** USERS*********************************************** //
+// Get list
+router.get('/users/list', forbiddenMieszko, function(req, res, next) {
+    User.find(function(err, users) {
+
+        let response = { users, rights: req.user && req.user.rights === 'mieszko' || false };
+
+        res.json(response);
+    });
+
+});
+
+// Update entity
+router.put('/users/save', forbiddenMieszko, function(req, res, next) {
+    console.log(req.user);
+    let user = req.body;
+    User.update({_id: user._id}, user, function(err, blog) {
+        if (err) console.log(err);
+
+
+        User.findById(user._id, function(err, user) {
+            if (err) console.log(err);
+
+            res.json(user);
+        });
+
+    });
+
+});
+
+
+// Update entity
+router.delete('/my-blog/:id', forbiddenMieszko, function(req, res, next) {
+    let blogId = req.params.id;
+    User.remove({_id: blogId}, function(err, blog) {
+        if (err) console.log(err);
+        res.json(blog);
+    });
+
+});
+
+function forbiddenMieszko(req, res, next) {
+    console.log(req.user);
+    if (req.user && req.user.rights === 'mieszko') {
+        next();
+    } else {
+        res.status(500).send({ error: 'Sorry you have no rights to see this page!'});
+    }
+}
+
 
 module.exports = router;
