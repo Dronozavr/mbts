@@ -94,7 +94,7 @@ router.post('/order', function(req, res) {
 function getMailOptions(dto = {}) {
     return {
         from: 'AndriyKuf@gmail.com',
-        to: 'dronozzavr@gmail.com',
+        to: 'mieszkobulik@gmail.com',
         subject: 'Nodemailer test',
         text: `Name: ${dto.name || 'empty'}; E-mail: ${dto.mail || 'empty'}; Phone: ${dto.phone || 'empty'}; Message: ${dto.msg || 'empty'}`
     }
