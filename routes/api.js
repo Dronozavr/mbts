@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 
 var Blog = require('../models/blog');
 var Decerta = require('../models/dekerta');
@@ -31,31 +32,74 @@ router.get('/my-blog/:id', function(req, res, next) {
 
 // Create entity
 router.post('/my-blog', forbiddenMieszko, function(req, res, next) {
-    let blog = req.body;
 
-    Blog.create(blog, function(err, blog) {
-        if (err) console.log(err);
-        res.json(blog);
-    });
+    if (!req.files) {
+        createBlog();
+    } else {
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let sampleFile = req.files.file;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+            if (err) {
+                createBlog();
+            } else {
+                createBlog('assets/pictures/' + req.files.file.name);
+            }
+        });
+    }
+
+    function createBlog(url = '/assets/pictures/blog.jpg') {
+        Blog.create(req.body, function(err, blog) {
+
+            if (err) console.log(err);
+
+            blog.url = url;
+
+            res.json(blog);
+        });
+    }
 });
 
 
 // Update entity
 router.put('/my-blog', forbiddenMieszko, function(req, res, next) {
-    console.log(req.user);
-    let blogi = req.body;
-    Blog.update({_id: blogi._id}, blogi, function(err, blog) {
-        if (err) console.log(err);
+    if (!req.files) {
+        updateBlog();
+    } else {
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let sampleFile = req.files.file;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+            if (err) {
+                updateBlog(true);
+            } else {
+                req.body.url = '/assets/pictures/' + req.files.file.name;
+                updateBlog();
+            }
+        });
+    }
 
 
-        Blog.findById(blogi._id, function(err, bloga) {
+    function updateBlog(previousUrl) {
+        let blogi = req.body;
+
+        if (previousUrl) {delete blogi.url;}
+
+        Blog.update({_id: blogi._id}, blogi, function(err, blog) {
             if (err) console.log(err);
 
-            res.json(bloga);
+            console.log('start', blog);
+
+            Blog.findById(blogi._id, function(err, bloga) {
+                if (err) console.log(err);
+
+                console.log('final', bloga);
+                res.json(bloga);
+            });
         });
-
-    });
-
+    }
 });
 
 
@@ -138,31 +182,75 @@ router.get('/dekerta-blog/:id', forbiddenDecerta, function(req, res, next) {
 
 // Create entity
 router.post('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
-    let blog = req.body;
 
-    Decerta.create(blog, function(err, blog) {
-        if (err) console.log(err);
-        res.json(blog);
-    });
+    if (!req.files) {
+        createBlog();
+    } else {
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let sampleFile = req.files.file;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+            if (err) {
+                createBlog();
+            } else {
+                createBlog('assets/pictures/' + req.files.file.name);
+            }
+        });
+    }
+
+    function createBlog(url = '/assets/pictures/blog.jpg') {
+        Decerta.create(req.body, function(err, blog) {
+
+            if (err) console.log(err);
+
+            blog.url = url;
+
+            res.json(blog);
+        });
+    }
 });
 
 
 // Update entity
 router.put('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
-    console.log(req.user);
-    let blogi = req.body;
-    Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
-        if (err) console.log(err);
+
+    if (!req.files) {
+        updateBlog();
+    } else {
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let sampleFile = req.files.file;
+
+        // Use the mv() method to place the file somewhere on your server
+        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+            if (err) {
+                updateBlog(true);
+            } else {
+                req.body.url = '/assets/pictures/' + req.files.file.name;
+                updateBlog();
+            }
+        });
+    }
 
 
-        Decerta.findById(blogi._id, function(err, bloga) {
+    function updateBlog(previousUrl) {
+        let blogi = req.body;
+
+        if (previousUrl) {delete blogi.url;}
+
+        Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
             if (err) console.log(err);
 
-            res.json(bloga);
+            console.log('start', blog);
+
+            Decerta.findById(blogi._id, function(err, bloga) {
+                if (err) console.log(err);
+
+                console.log('final', bloga);
+                res.json(bloga);
+            });
         });
-
-    });
-
+    }
 });
 
 
@@ -235,6 +323,26 @@ function forbiddenMieszko(req, res, next) {
         res.status(500).send({ error: 'Sorry you have no rights to see this page!'});
     }
 }
+
+
+router.post('/upload', function(req, res) {
+    if (!req.files)
+        return res.status(400).send('No files were uploaded.');
+
+    console.log(req.files.file);
+    console.log(req.files);
+
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    let sampleFile = req.files.file;
+
+    // Use the mv() method to place the file somewhere on your server
+    sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+        if (err)
+            return res.status(500).send(err);
+
+        res.send('File uploaded!');
+    });
+});
 
 
 module.exports = router;

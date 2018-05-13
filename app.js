@@ -3,10 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var cors = require('cors')
+var cors = require('cors');
 var mongoose = require('mongoose');
 var cookieSession = require('cookie-session');
 const passport = require('passport');
+const fileUpload = require('express-fileupload');;
+
+
 
 const keys = require('./config/keys');
 var indexRouter = require('./routes/index');
@@ -39,6 +42,7 @@ app.use(cookieSession({
 }));
 
 // initialize passport
+app.use(fileUpload());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(logger('dev'));
