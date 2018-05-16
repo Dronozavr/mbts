@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var path = require('path');
+var fs = require('fs')
+    , gm = require('gm');
 
 var Blog = require('../models/blog');
 var Decerta = require('../models/dekerta');
@@ -39,17 +41,46 @@ router.post('/my-blog', forbiddenMieszko, function(req, res, next) {
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
         let sampleFile = req.files.file;
 
-        // Use the mv() method to place the file somewhere on your server
-        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+        if (req.files.file.truncated) {
+            res.status(413).send('Not Acceptable');
+        }
+
+        console.log(req.body.crop);
+        console.log(req.body.url);
+
+
+        let magic = gm(req.files.file.data);
+        let arr = req.body.crop.split(',');
+        let clientWidth = arr[0];
+        let clientHeight = arr[1];
+        let clientX = arr[2];
+        let clientY = arr[3];
+
+        magic.size({bufferStream: true}, (err, {width, height}) => {
             if (err) {
+                console.log(err);
                 createBlog();
-            } else {
-                createBlog('assets/pictures/' + req.files.file.name);
             }
+            let widthy = width / 100 * clientWidth;
+            let heighty = height / 100 * clientHeight;
+            let x = width / 100 * clientX;
+            let y = height / 100 * clientY;
+
+            magic.crop(widthy, heighty, x, y)
+                .write(path.join(__dirname, '../public' + req.body.url), function (err) {
+                        if (err) {
+                            createBlog();
+                        } else {
+                            createBlog(req.body.url);
+                        }
+                });
         });
+
     }
 
     function createBlog(url = '/assets/pictures/blog.jpg') {
+        delete req.body.crop;
+
         Blog.create(req.body, function(err, blog) {
 
             if (err) console.log(err);
