@@ -43,7 +43,7 @@ app.use(cookieSession({
 
 // initialize passport
 app.use(fileUpload({
-    limits: { fileSize: 15000000 }
+    limits: { fileSize: 150000000 }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
