@@ -33,16 +33,16 @@ router.get('/my-blog/:id', function(req, res, next) {
 
 
 // Create entity
-router.post('/my-blog', function(req, res, next) {
+router.post('/my-blog', forbiddenMieszko, function(req, res, next) {
 
     if (!req.files) {
         createBlog();
     } else {
 
-        // if (req.files.file.truncated) {
-        //     console.log('tRUncated');
-        //     res.status(413).send('File is too big!');
-        // }
+        if (req.files.file.truncated) {
+            console.log('tRUncated');
+            res.status(413).send('File is too big!');
+        }
 
         let magic = gm(req.files.file.data);
         let arr = req.body.crop.split(',');
@@ -207,44 +207,6 @@ router.post('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
     if (!req.files) {
         updateBlog();
     } else {
-        let { file } = req.files;
-
-        // Use the mv() method to place the file somewhere on your server
-        file.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), (err) => {
-            if (err) {
-                updateBlog(true);
-            } else {
-                req.body.url = '/assets/pictures/' + req.files.file.name;
-                updateBlog();
-            }
-        });
-    }
-
-
-    function updateBlog(previousUrl) {
-        let blogi = req.body;
-
-        if (previousUrl) {delete blogi.url;}
-
-        Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
-            if (err) console.log(err);
-
-            Decerta.findById(blogi._id, function(err, result) {
-                if (err) console.log(err);
-
-                res.json(result);
-            });
-        });
-    }
-});
-
-
-// Update entity
-router.put('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
-
-    if (!req.files) {
-        updateBlog();
-    } else {
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
         let sampleFile = req.files.file;
 
@@ -273,8 +235,45 @@ router.put('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
             Decerta.findById(blogi._id, function(err, bloga) {
                 if (err) console.log(err);
 
-                console.log('final', bloga);
                 res.json(bloga);
+            });
+        });
+    }
+});
+
+
+// Update entity
+router.put('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
+
+    if (!req.files) {
+        updateBlog();
+    } else {
+        let { file } = req.files;
+
+        // Use the mv() method to place the file somewhere on your server
+        file.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), (err) => {
+            if (err) {
+                updateBlog(true);
+            } else {
+                req.body.url = '/assets/pictures/' + req.files.file.name;
+                updateBlog();
+            }
+        });
+    }
+
+
+    function updateBlog(previousUrl) {
+        let blogi = req.body;
+
+        if (previousUrl) {delete blogi.url;}
+
+        Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
+            if (err) console.log(err);
+
+            Decerta.findById(blogi._id, function(err, result) {
+                if (err) console.log(err);
+
+                res.json(result);
             });
         });
     }
