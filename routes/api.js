@@ -39,9 +39,10 @@ router.post('/my-blog', function(req, res, next) {
         createBlog();
     } else {
 
-        if (req.files.file.truncated) {
-            res.status(413).send('File is too big!');
-        }
+        // if (req.files.file.truncated) {
+        //     console.log('tRUncated');
+        //     res.status(413).send('File is too big!');
+        // }
 
         let magic = gm(req.files.file.data);
         let arr = req.body.crop.split(',');
