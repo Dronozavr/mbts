@@ -40,7 +40,6 @@ router.post('/my-blog', forbiddenMieszko, function(req, res, next) {
     } else {
 
         if (req.files.file.truncated) {
-            console.log('tRUncated');
             res.status(413).send('File is too big!');
         }
 
@@ -205,38 +204,52 @@ router.get('/dekerta-blog/:id', forbiddenDecerta, function(req, res, next) {
 // Create entity
 router.post('/dekerta-blog', forbiddenMieszko, function(req, res, next) {
     if (!req.files) {
-        updateBlog();
+        createBlog();
     } else {
-        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-        let sampleFile = req.files.file;
 
-        // Use the mv() method to place the file somewhere on your server
-        sampleFile.mv(path.join(__dirname, '../public/assets/pictures/' + req.files.file.name), function(err) {
+        if (req.files.file.truncated) {
+            res.status(413).send('File is too big!');
+        }
+
+        let magic = gm(req.files.file.data);
+        let arr = req.body.crop.split(',');
+        let clientWidth = arr[0];
+        let clientHeight = arr[1];
+        let clientX = arr[2];
+        let clientY = arr[3];
+
+        magic.size({bufferStream: true}, (err, {width, height}) => {
             if (err) {
-                updateBlog(true);
-            } else {
-                req.body.url = '/assets/pictures/' + req.files.file.name;
-                updateBlog();
+                console.log(err);
+                createBlog();
             }
+            let widthy = width / 100 * clientWidth;
+            let heighty = height / 100 * clientHeight;
+            let x = width / 100 * clientX;
+            let y = height / 100 * clientY;
+
+            magic.crop(widthy, heighty, x, y)
+                .write(path.join(__dirname, '../public' + req.body.url), function (err) {
+                    if (err) {
+                        createBlog();
+                    } else {
+                        createBlog(req.body.url);
+                    }
+                });
         });
+
     }
 
+    function createBlog(url = '/assets/pictures/blog.jpg') {
+        delete req.body.crop;
 
-    function updateBlog(previousUrl) {
-        let blogi = req.body;
+        Decerta.create(req.body, function(err, blog) {
 
-        if (previousUrl) {delete blogi.url;}
-
-        Decerta.update({_id: blogi._id}, blogi, function(err, blog) {
             if (err) console.log(err);
 
-            console.log('start', blog);
+            blog.url = url;
 
-            Decerta.findById(blogi._id, function(err, bloga) {
-                if (err) console.log(err);
-
-                res.json(bloga);
-            });
+            res.json(blog);
         });
     }
 });
