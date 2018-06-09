@@ -7,16 +7,37 @@ var fs = require('fs')
 var Blog = require('../models/blog');
 var Decerta = require('../models/dekerta');
 var User = require('../models/user-model');
+var waterfall = require('async/waterfall');
 
 // Get list
 router.get('/my-blog/list', function(req, res, next) {
-  Blog.find(function(err, blogs) {
+  waterfall([
+    (cb) => {
+      let query = Blog.count((err, total) => {
+        if (err) cb(err);
+        let dto = {total};
+        cb(null, query, dto);
+      });
+    },
+    (query, dto, cb) => {
+      query.sort({ date: 'desc'}).skip(
+        ((!req.query.page || req.query.page === 1) ? 0 : req.query.page - 1) * 7
+      ).limit(7).exec('find', (err, blogs) => {
 
-      let response = { blogs, rights: req.user && req.user.rights === 'mieszko' || false };
+        dto.blogs = blogs;
+        dto.rights = req.user && req.user.rights === 'mieszko' || false;
 
+
+        cb(null, dto);
+      });
+    }
+  ], (err, response) => {
+    if (err) {
+      console.log('bla-bla', err);
+    } else {
       res.json(response);
+    }
   });
-
 });
 
 // Get entity
@@ -179,11 +200,32 @@ function forbidden(req, res, next) {
 // ******************************************* DEKERTA ***************************************** //
 // Get list
 router.get('/dekerta-blog/list', forbiddenDecerta, function(req, res, next) {
-    Decerta.find(function(err, blogs) {
+    waterfall([
+      (cb) => {
+        let query = Decerta.count((err, total) => {
+          if (err) cb(err);
+          let dto = {total};
+          cb(null, query, dto);
+        });
+      },
+      (query, dto, cb) => {
+        query.sort({ date: 'desc'}).skip(
+          ((!req.query.page || req.query.page === 1) ? 0 : req.query.page - 1) * 7
+        ).limit(7).exec('find', (err, blogs) => {
 
-        let response = { blogs, rights: req.user && req.user.rights === 'mieszko' || false };
+          dto.blogs = blogs;
+          dto.rights = req.user && req.user.rights === 'mieszko' || false;
 
+
+          cb(null, dto);
+        });
+      }
+    ], (err, response) => {
+      if (err) {
+        console.log('bla-bla', err);
+      } else {
         res.json(response);
+      }
     });
 
 });
