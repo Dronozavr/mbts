@@ -202,9 +202,11 @@ router.get('/dekerta-blog/list', function(req, res, next) {
         });
       },
       (query, dto, cb) => {
-        query.sort({ date: 'desc'}).skip(
-          ((!req.query.page || req.query.page === 1) ? 0 : req.query.page - 1) * 7
-        ).limit(7).exec('find', (err, blogs) => {
+        query.sort({ date: 'desc'})
+             .skip(
+          ((!req.query.page || req.query.page === 1) ? 0 : req.query.page - 1) * 7)
+          .limit(7)
+          .exec('find', (err, blogs) => {
 
           dto.blogs = blogs;
           dto.rights = req.user && req.user.rights === 'mieszko' || false;
@@ -532,7 +534,6 @@ router.delete('/my-blog/:id', forbiddenMieszko, function(req, res, next) {
 });
 
 function forbiddenMieszko(req, res, next) {
-    console.log(req.user);
     if (req.user && req.user.rights === 'mieszko') {
         next();
     } else {
