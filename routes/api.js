@@ -18,8 +18,9 @@ router.get('/my-blog/list', function({query, user}, res, next) {
 
   try {
     (async () => {
-      let total = await Blog.count(),
-          blogs = await Blog.find()
+      let total = await Blog.count();
+      total = total > 60 ? 60 : total
+      let blogs = await Blog.find()
                             .sort({ date: 'desc'})
                             .skip(skip)
                             .limit(7)
