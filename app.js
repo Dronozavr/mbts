@@ -21,9 +21,12 @@ const passportSetup = require('./config/passport.setup');
 var app = express();
 
 Blog = require('./models/blog');
-
-mongoose.connect(keys.mongodb.dbURI);
-
+console.log(process.env.IS_DEV);
+if (process.env.IS_DEV === 'dev') {
+  mongoose.connect(keys.mongodb.devDbURI);
+} else {
+  mongoose.connect(keys.mongodb.dbURI);
+}
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
