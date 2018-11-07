@@ -9,6 +9,9 @@ var Decerta = require('../models/dekerta');
 var Articles = require('../models/articles');
 var User = require('../models/user-model');
 var waterfall = require('async/waterfall');
+// todo: finish config
+// var config = require('./config');
+
 
 // Get list
 router.get('/my-blog/list', function({query, user}, res, next) {
@@ -193,7 +196,7 @@ function forbidden(req, res, next) {
 
 // ******************************************* DEKERTA ***************************************** //
 // Get list
-router.get('/dekerta-blog/list', function(req, res, next) {
+router.get('/dekerta-blog/list', forbiddenDecerta, function(req, res, next) {
     waterfall([
       (cb) => {
         let query = Decerta.count((err, total) => {
